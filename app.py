@@ -69,11 +69,12 @@ def main():
         st.error(f"{error} Check your internet and try again.")
         return
 
-    st.metric(label=f"1 {rate.base} =", value=f"{rate.rate:.{RATE_DECIMALS}f} {rate.quote}")
-    st.success(
-        f"{amount:,.{MONEY_DECIMALS}f} {rate.base} = {converted:,.{MONEY_DECIMALS}f} {rate.quote}"
-    )
-    st.caption(f"Rate date: {rate.date} · Source: Frankfurter")
+    with st.container(border=True):
+        st.metric(label=f"1 {rate.base} =", value=f"{rate.rate:.{RATE_DECIMALS}f} {rate.quote}")
+        st.success(
+            f"{amount:,.{MONEY_DECIMALS}f} {rate.base} = {converted:,.{MONEY_DECIMALS}f} {rate.quote}"
+        )
+        st.caption(f"Rate date: {rate.date} · Source: Frankfurter")
 
 
 main()
