@@ -11,4 +11,7 @@ class InvalidCurrencyError(FxTrackerError):
 
 class RateServiceUnavailableError(FxTrackerError):
     """The API could not be reached (no internet, timeout, or server error)."""
-    
+
+
+class InvalidAmountError(FxTrackerError):
+    """The amount to convert must be greater than 0."""
