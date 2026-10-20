@@ -83,3 +83,6 @@ fx-tracker/
 ## Project Links
 - Canvas Individual Project page: https://nku.instructure.com/courses/91834/pages/individual-project-page-of-bebba-elmane
 - Canvas Individual Project Progress page: https://nku.instructure.com/courses/91834/pages/individual-project-progress-page-of-bebba-elmane-in-ase420
+- Sprint 1 Review presentation: presentation/sprint1_review.md
+- User Manual (draft): docs/user_manual.md
+- Architecture and Design Document (draft): docs/architecture.md
