@@ -12,201 +12,114 @@ https://github.com/BElmane/fx-tracker
 
 ---
 
-## Imagine this
+## The Problem
 
-Your family sends you **$500** from back home.
+- Exchange rates change every day
+- $500 at 9.78 MAD = **4,890 MAD**
+- $500 at 9.60 MAD = **4,800 MAD**
+- Bad timing = **90 MAD lost**
 
-- How much will you **really** get?
-- Is **today** a good day to convert, or should you wait?
-
-Most people just guess.
-
----
-
-## Why it matters
-
-Exchange rates change **every day**.
-
-If the USD to MAD rate goes from **9.78 to 9.60**, then on $500:
-
-- 9.78 gives **4,890 MAD**
-- 9.60 gives **4,800 MAD**
-
-That's **90 MAD lost** just from bad timing.
+**Users:** travelers, students whose families send money, anyone who converts money
 
 ---
 
-## Who needs this?
+## My Solution
 
-- **Travelers** who want to know what their money is worth abroad
-- **Students** whose families send money from another country
-- **Anyone** who sends or converts money between currencies
+A simple app that shows **live exchange rates**
 
----
-
-## My solution: FX Tracker
-
-A simple app that shows **live exchange rates** in seconds.
-
-- **165 currencies**
-- **Real data** from the Frankfurter API
-- **Clean and easy**
+- 165 currencies
+- Real data from the Frankfurter API
+- Convert any amount, swap in one click
 
 ---
 
-## Demo: check a rate
+## Demo
 
 ![w:600](images/app_rate.png)
 
-Pick two currencies, type an amount, and get the answer right away. The swap button switches them.
-
 ---
 
-## Demo: it doesn't break
+## Demo: Errors
 
 ![w:600](images/app_warning.png)
 
-- Same currency or amount 0: a friendly warning
-- No internet: a clear message
-- **The app never crashes**
+Friendly warnings, and the app never crashes
 
 ---
 
-## Sprint 1 results
+## Weekly Progress Sprint 1
 
-| | Done | Planned | % |
-|---|---:|---:|---:|
-| Features | 3 | 3 | **100%** |
-| Requirements | 2 | 2 | **100%** |
-
-- **258** lines of app code
-- **324** lines of test code
-- **35** tests passing
-- Extra: an amount converter and a swap button
+- **Week 5:** repo and README, tested the API by hand
+- **Week 6:** chose Frankfurter v2 over v1
+- **Week 7:** planned the app structure and tests
+- **Week 8:** built the full prototype, 35 tests, PR #1 merged
 
 ---
 
-## Burndown: remaining requirements
+## Sprint 1 Metrics
 
-| Point | Remaining |
-|---|---:|
-| Start | 2 |
-| End of Week 5 | 2 |
-| End of Week 6 | 2 |
-| End of Week 7 | 2 |
-| End of Week 8 | **0** |
-
----
-
-## Schedule: planned vs. actual
-
-| Week | Planned | Actual |
-|---|---|---|
-| 5 | Repo, venv, start API | Repo and README, tested the API by hand |
-| 6 | API, currency selection, rate | Chose Frankfurter v2 over v1 |
-| 7 | Error handling, prototype | app structure |
-| 8 | Test, record progress | Full prototype, 35 tests, PR #1 merged |
+- Lines of code: **258** app, **324** tests
+- Tests: **35** (21 unit, 4 integration, 5 regression, 5 acceptance)
+- Features: **3 / 3**
+- Requirements: **2 / 2**
+- Burndown rate for features = **100%**
+- Burndown rate for requirements = **100%**
 
 ---
 
-## How it's built
+## Design
 
-| Part | File | Job |
-|---|---|---|
-| Screen | `app.py` | Shows the rates to the user |
-| Rules | `rate_service.py` | Checks input and converts money |
-| Contract | `rate_provider.py` | Says what any data source must do |
-| Data | `frankfurter_client.py` | Gets real rates from the API |
-
-The rules only talk to the **contract**, not the API directly. So I can swap the data source later, and **nothing else changes**.
+- **Abstraction:** `RateProvider` is a contract for any data source
+- **Dependency Injection:** `RateService` gets its provider passed in
+- **Result:** tests use a fake provider, no internet needed
+- **Refactoring:** moved shared test fakes into one file (`tests/fakes.py`)
 
 ---
 
-## The design ideas behind it
+## What Went Wrong
 
-| Idea | What it does for the user |
-|---|---|
-| Abstraction | Can swap the data source anytime |
-| Inheritance / Polymorphism | Real API and test version work the same way |
-| Encapsulation | Rates can't be changed by mistake |
-| Dependency Injection | Easy to test without internet |
-| Single Responsibility | Screen, rules, and API are separate |
-| No magic numbers | Settings live in one place |
+- Git workflow mistakes, like editing files in two places
+- Small mistakes: unsaved files, indentation, a file-name typo
+- Learning new tools while building(Streamlit, Apptest)
 
 ---
 
-## Cleaner code: one refactoring
+## What Went Well
 
-- **Problem:** the same fake test objects were going to be copied into 2 files
-- **Fix:** moved them into one shared file, `tests/fakes.py`
-- **Result:** less code, one place to change
-
----
-
-## Built to be trusted: 35 tests
-
-| Type | Count | What it checks |
-|---|---:|---|
-| Unit | 21 | Each part on its own |
-| Integration | 4 | Parts working together |
-| Regression | 5 | Tricky cases stay fixed |
-| Acceptance | 5 | Uses the app like a real user |
-
-![w:420](images/pytest_pass.png)
+- The design made testing easy
+- All 4 test types done
+- The prototype works with real rates
 
 ---
 
-## What I learned (retrospective)
+## Improvement Plan
 
-**Went well**
-- The design made testing easy. Most tests run without internet.
-- All 4 test types are done.
-
-**Went wrong**
-- Small mistakes: unsaved files, indentation, a typo in a file name
-
-**What I'll do better**
-- Small commits
+- Small commits every week
 - Run tests before every commit
 
 ---
 
-## What's next: Sprint 2
+## Sprint 2 Goals
 
-The feature everyone wants:
-### "Tell me when the rate is good."
+- Track many currency pairs
+- Save rate history and show a trend chart
+- Set a target rate and get an alert
+- User Manual, Architecture Doc, GitHub Pages
 
-- **Target rate alerts:** set a goal, get told when it's reached
-- **Trend chart:** see if the rate is going up or down
-- **Track many pairs** at once
-- **Save rate history**
-
----
-
-## Sprint 2 plan
-
-- **MVP:** 5 new features, 3 new requirements
-- **Design:** new parts in small classes with DI (like a storage class), plus a pattern that fits the alerts
-- **Docs:** User Manual, Architecture Doc, GitHub Pages website
-- **Tests:**
-  - Unit: `test_history.py`, `test_alerts.py`
-  - Integration: history, storage, and API together
-  - Regression: all 35 Sprint 1 tests keep passing
-  - Acceptance: add a pair, set a target, see the alert
+**Planned:** 5 features, 3 requirements, tests for all 4 types
 
 ---
 
-## Sprint 2 timeline
+## Sprint 2 Timeline
 
-| Weeks | Plan |
-|---|---|
-| 9 | Finalize the prototype, S1P |
-| 10–11 | Review and refactor the Sprint 1 code |
-| 12–13 | Multi-pair tracking, target rates, documents, website |
-| 14 | Trend view and testing the new features |
-| 15 | Finalize MVP and docs, submit (Dec 5) |
+- **Week 9:** S1P
+- **Weeks 10–11:** refactor Sprint 1 code
+- **Weeks 12–13:** multi-pair tracking, target rates, docs, website
+- **Week 14:** trend view and testing
+- **Week 15:** final submission (12/5)
 
 ---
-# Thank you!
 
-**GitHub:** https://github.com/BElmane/fx-tracker
+# Questions?
+
+https://github.com/BElmane/fx-tracker
