@@ -24,6 +24,12 @@ class FakeRateProvider(RateProvider):
     def get_rate(self, base, quote):
         return ExchangeRate(base, quote, FAKE_RATE, FAKE_DATE)
 
+    def get_history(self, base, quote, start):
+        return (
+            ExchangeRate(base, quote, FAKE_RATE, "2026-11-01"),
+            ExchangeRate(base, quote, FAKE_RATE, "2026-11-02"),
+        )
+
 
 @pytest.fixture
 def service():
