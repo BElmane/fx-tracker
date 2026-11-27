@@ -26,8 +26,14 @@ def test_saved_file_is_readable_json(tmp_path):
     path = tmp_path / "watchlist.json"
     JsonWatchlistStore(path).save(ITEMS)
     data = json.loads(path.read_text(encoding="utf-8"))
-    assert data[0] == {"base": "USD", "quote": "MAD", "target": 10.0}
+    assert data[0] == {"base": "USD", "quote": "MAD", "target": 10.0, "direction": "above"}
     assert data[1]["target"] is None
+
+
+def test_old_file_without_direction_still_loads(tmp_path):
+    path = tmp_path / "watchlist.json"
+    path.write_text('[{"base": "USD", "quote": "MAD", "target": 10.0}]', encoding="utf-8")
+    assert JsonWatchlistStore(path).load()[0].direction == "above"
 
 
 def test_broken_file_raises_our_own_error(tmp_path):

@@ -6,7 +6,7 @@ from fx_tracker.errors import InvalidCurrencyError, InvalidTargetError, Watchlis
 from fx_tracker.models import WatchItem
 from fx_tracker.rate_service import RateService
 from fx_tracker.watchlist_service import WatchlistService
-from tests.fakes import UNSUPPORTED_CODE, FakeRateProvider, FakeWatchlistStore
+from tests.fakes import FAKE_RATE, UNSUPPORTED_CODE, FakeRateProvider, FakeWatchlistStore
 
 
 def make_watchlist(items=()):
@@ -88,4 +88,40 @@ def test_set_target_blocks_bad_targets():
     watchlist = make_watchlist((WatchItem("USD", "MAD"),))
     with pytest.raises(InvalidTargetError):
         watchlist.set_target("USD/MAD", -5)
-        
+
+
+def test_check_alerts_finds_only_targets_that_were_reached():
+    watchlist = make_watchlist(
+        (
+            WatchItem("USD", "MAD", 0.4, "above"),
+            WatchItem("EUR", "USD", 0.6, "above"),
+            WatchItem("GBP", "USD", 0.6, "below"),
+            WatchItem("JPY", "USD"),
+        )
+    )
+    alerts = watchlist.check_alerts()
+    assert [alert.item.pair for alert in alerts] == ["USD/MAD", "GBP/USD"]
+
+
+def test_check_alerts_includes_the_current_rate():
+    watchlist = make_watchlist((WatchItem("USD", "MAD", 0.4, "above"),))
+    alert = watchlist.check_alerts()[0]
+    assert alert.rate.rate == FAKE_RATE
+
+
+def test_check_alerts_is_empty_when_no_targets_are_set():
+    watchlist = make_watchlist((WatchItem("USD", "MAD"), WatchItem("EUR", "USD")))
+    assert watchlist.check_alerts() == ()
+
+
+def test_add_blocks_unknown_direction():
+    watchlist = make_watchlist()
+    with pytest.raises(InvalidTargetError):
+        watchlist.add("USD", "MAD", 10.0, "sideways")
+
+
+def test_set_target_can_change_the_direction():
+    watchlist = make_watchlist((WatchItem("USD", "MAD", 10.0, "above"),))
+    watchlist.set_target("USD/MAD", 9.5, "below")
+    item = watchlist.items()[0]
+    assert (item.target, item.direction) == (9.5, "below")
