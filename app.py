@@ -5,6 +5,7 @@ import pandas as pd
 import streamlit as st
 
 from fx_tracker.alert_rules import ABOVE, ALERT_RULES, BELOW
+from fx_tracker.caching_rate_provider import CachingRateProvider
 from fx_tracker.config import (
     DEFAULT_FROM_CURRENCY,
     DEFAULT_HISTORY_DAYS,
@@ -30,8 +31,8 @@ DIRECTION_LABELS = {ABOVE: "Goes up to", BELOW: "Goes down to"}
 
 @st.cache_resource
 def build_service() -> RateService:
-    """Create the rate service once and inject the real API client."""
-    return RateService(FrankfurterClient())
+    """Create the rate service once. The caching proxy sits in front of the real API client."""
+    return RateService(CachingRateProvider(FrankfurterClient()))
 
 
 @st.cache_resource
