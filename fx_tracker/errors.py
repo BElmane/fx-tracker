@@ -19,3 +19,7 @@ class InvalidAmountError(FxTrackerError):
 
 class InvalidPeriodError(FxTrackerError):
     """The number of history days must be greater than 0."""
+
+
+class WatchlistStorageError(FxTrackerError):
+    """The saved watchlist file could not be read."""
