@@ -1,5 +1,5 @@
 """The contract that every exchange-rate source must follow."""
-
+from datetime import date
 from abc import ABC, abstractmethod
 
 from fx_tracker.models import Currency, ExchangeRate
@@ -15,4 +15,7 @@ class RateProvider(ABC):
     @abstractmethod
     def get_rate(self, base: str, quote: str) -> ExchangeRate:
         """Return the latest rate from base to quote."""
-        
+
+    @abstractmethod
+    def get_history(self, base: str, quote: str, start: date) -> tuple[ExchangeRate, ...]:
+        """Return daily rates from the start date until today, oldest first."""

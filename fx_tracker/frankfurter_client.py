@@ -1,7 +1,7 @@
 """Talks to the Frankfurter v2 exchange-rate API."""
 
 import requests
-
+from datetime import date
 from fx_tracker.config import API_BASE_URL, REQUEST_TIMEOUT_SECONDS
 from fx_tracker.errors import InvalidCurrencyError, RateServiceUnavailableError
 from fx_tracker.models import Currency, ExchangeRate
@@ -28,11 +28,21 @@ class FrankfurterClient(RateProvider):
 
     def get_rate(self, base: str, quote: str) -> ExchangeRate:
         data = self._get_json(f"/rate/{base.lower()}/{quote.lower()}")
+        return self._to_exchange_rate(data)
+
+    def get_history(self, base: str, quote: str, start: date) -> tuple[ExchangeRate, ...]:
+        path = f"/rates?base={base.lower()}&quotes={quote.lower()}&from={start.isoformat()}"
+        data = self._get_json(path)
+        return tuple(self._to_exchange_rate(item) for item in data)
+
+    @staticmethod
+    def _to_exchange_rate(item) -> ExchangeRate:
+        """Turn one rate from the API into an ExchangeRate."""
         return ExchangeRate(
-            base=data["base"],
-            quote=data["quote"],
-            rate=float(data["rate"]),
-            date=data["date"],
+            base=item["base"],
+            quote=item["quote"],
+            rate=float(item["rate"]),
+            date=item["date"],
         )
 
     def _get_json(self, path: str):

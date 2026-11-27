@@ -15,3 +15,7 @@ class RateServiceUnavailableError(FxTrackerError):
 
 class InvalidAmountError(FxTrackerError):
     """The amount to convert must be greater than 0."""
+
+
+class InvalidPeriodError(FxTrackerError):
+    """The number of history days must be greater than 0."""
