@@ -1,11 +1,16 @@
 """Regression tests: tricky cases that already work and must keep working."""
 
+from datetime import date
+
 import pytest
 
-from fx_tracker.errors import InvalidCurrencyError, RateServiceUnavailableError
+from fx_tracker.caching_rate_provider import CachingRateProvider
+from fx_tracker.errors import InvalidCurrencyError, RateServiceUnavailableError, WatchlistStorageError
 from fx_tracker.frankfurter_client import FrankfurterClient
 from fx_tracker.rate_service import RateService
-from tests.fakes import HTTP_OK, FakeResponse, FakeSession
+from fx_tracker.watchlist_service import WatchlistService
+from fx_tracker.watchlist_store import JsonWatchlistStore
+from tests.fakes import HTTP_OK, FakeRateProvider, FakeResponse, FakeSession, FakeWatchlistStore
 
 TEST_URL = "https://test.api"
 API_ERROR_CODE = 422
@@ -59,4 +64,34 @@ def test_rate_sent_as_text_is_turned_into_a_number():
     session = FakeSession(response=FakeResponse(HTTP_OK, data))
     rate = make_client(session).get_rate("USD", "EUR")
     assert rate.rate == 0.89
-    
+
+
+def test_empty_history_does_not_crash():
+    """If the API has no history for a pair, we get an empty result."""
+    session = FakeSession(response=FakeResponse(HTTP_OK, []))
+    history = make_client(session).get_history("USD", "MAD", date(2026, 11, 1))
+    assert history == ()
+
+
+def test_swapped_pairs_are_different_watchlist_items():
+    """USD/MAD and MAD/USD are two different pairs, so both are allowed."""
+    watchlist = WatchlistService(FakeWatchlistStore(), RateService(FakeRateProvider()))
+    watchlist.add("USD", "MAD")
+    watchlist.add("MAD", "USD")
+    assert [item.pair for item in watchlist.items()] == ["USD/MAD", "MAD/USD"]
+
+
+def test_watchlist_file_with_unknown_field_raises_our_own_error(tmp_path):
+    """A file with an extra field we don't know must not crash the app."""
+    path = tmp_path / "watchlist.json"
+    path.write_text('[{"base": "USD", "quote": "MAD", "color": "red"}]', encoding="utf-8")
+    with pytest.raises(WatchlistStorageError):
+        JsonWatchlistStore(path).load()
+
+
+def test_proxy_keeps_swapped_pairs_separate():
+    """The cache key is the pair in order, so USD/MAD never answers for MAD/USD."""
+    proxy = CachingRateProvider(FakeRateProvider())
+    usd_mad = proxy.get_rate("USD", "MAD")
+    mad_usd = proxy.get_rate("MAD", "USD")
+    assert (usd_mad.base, mad_usd.base) == ("USD", "MAD")
