@@ -1,7 +1,9 @@
-"""Talks to the Frankfurter v2 exchange-rate API."""
+"""Adapter: talks to the Frankfurter v2 web API and gives back our own objects and errors."""
+
+from datetime import date
 
 import requests
-from datetime import date
+
 from fx_tracker.config import API_BASE_URL, REQUEST_TIMEOUT_SECONDS
 from fx_tracker.errors import InvalidCurrencyError, RateServiceUnavailableError
 from fx_tracker.models import Currency, ExchangeRate
@@ -72,4 +74,3 @@ class FrankfurterClient(RateProvider):
             return response.json().get("message", "Invalid currency.")
         except ValueError:
             return "Invalid currency."
-        

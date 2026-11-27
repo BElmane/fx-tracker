@@ -5,42 +5,15 @@ from datetime import date
 import pytest
 
 from fx_tracker.errors import InvalidAmountError, InvalidCurrencyError, InvalidPeriodError
-from fx_tracker.models import Currency, ExchangeRate
-from fx_tracker.rate_provider import RateProvider
 from fx_tracker.rate_service import RateService
+from tests.fakes import FAKE_RATE, FakeRateProvider
 
-FAKE_RATE = 0.5
-FAKE_DATE = "2026-10-14"
 FAKE_TODAY = date(2026, 11, 26)
 
 
 def fake_today():
     """Pretends today is always Nov 26, 2026, so tests never change."""
     return FAKE_TODAY
-
-
-class FakeRateProvider(RateProvider):
-    """Pretends to be the API. Always gives the same answers."""
-
-    def __init__(self):
-        self.currency_calls = 0
-        self.last_history_pair = None
-        self.last_history_start = None
-
-    def get_currencies(self):
-        self.currency_calls += 1
-        return (Currency("USD", "US Dollar"), Currency("EUR", "Euro"))
-
-    def get_rate(self, base, quote):
-        return ExchangeRate(base, quote, FAKE_RATE, FAKE_DATE)
-
-    def get_history(self, base, quote, start):
-        self.last_history_pair = (base, quote)
-        self.last_history_start = start
-        return (
-            ExchangeRate(base, quote, FAKE_RATE, "2026-11-01"),
-            ExchangeRate(base, quote, FAKE_RATE, "2026-11-02"),
-        )
 
 
 @pytest.fixture

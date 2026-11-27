@@ -19,3 +19,15 @@ class InvalidAmountError(FxTrackerError):
 
 class InvalidPeriodError(FxTrackerError):
     """The number of history days must be greater than 0."""
+
+
+class WatchlistStorageError(FxTrackerError):
+    """The saved watchlist file could not be read."""
+
+
+class InvalidTargetError(FxTrackerError):
+    """The target rate must be greater than 0."""
+
+
+class WatchlistError(FxTrackerError):
+    """The pair is already in the watchlist, or is not in it."""
